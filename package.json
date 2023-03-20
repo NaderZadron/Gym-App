@@ -4,7 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "mocha tests/api.test.js"
+    "test": "mocha tests/api.test.js",
+    "start": "node server.js"
   },
   "keywords": [],
   "author": "",
