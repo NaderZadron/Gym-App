@@ -89,17 +89,17 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Configure PassportJS to serialize and deserialize user objects
-passport.serializeUser(function (User, cb) {
+passport.serializeUser(function (user, cb) {
   process.nextTick(function () {
     return cb(null, {
-      id: User.id,
-      username: User.emailAddr,
+      id: user.id,
+      username: user.emailAddr,
     });
   });
 });
-passport.deserializeUser(function (User, cb) {
+passport.deserializeUser(function (user, cb) {
   process.nextTick(function () {
-    return cb(null, User.id);
+    return cb(null, user.id);
   });
 });
 
@@ -121,7 +121,7 @@ passport.use(
         crypto.pbkdf2(
           password,
           user.salt,
-          310000,
+          10000,
           32,
           "sha256",
           function (err, hashedPassword) {
