@@ -16,7 +16,15 @@ const crypto = require("crypto");
 const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
+const cors = require("cors");
 
+app.use(
+  cors({
+    origin: "http://localhost:3000" || process.env.REACT_URI,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 /* Sanitize Mongo */
 app.use(mongoSanitize());
 
