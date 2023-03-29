@@ -67,7 +67,6 @@ router.post(
   passport.authenticate("local", {
     successRedirect: "/",
     failureRedirect: "/login",
-    failureMessage: true,
   }),
   (req, res) => {
     req.session.user_id = req.user.id;
