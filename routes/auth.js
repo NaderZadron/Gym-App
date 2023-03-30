@@ -69,7 +69,12 @@ router.post(
     failureRedirect: "/login",
   }),
   (req, res) => {
-    req.session.user_id = req.user.id;
+    res.cookie("cookie_name", "cookie_value", {
+      httpOnly: true,
+      secure: true,
+      expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+    });
     res.status(200).json("Login Success");
   }
 );

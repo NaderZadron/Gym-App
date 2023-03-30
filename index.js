@@ -72,12 +72,6 @@ app.use(
       secret: process.env.SECRET,
       touchAfter: 24 * 60 * 60,
     }),
-    cookie: {
-      httpOnly: true,
-      secure: true,
-      expires: Date.now() + 1000 * 60 * 60 * 24 * 7,
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-    },
   })
 );
 /* Middleware */
