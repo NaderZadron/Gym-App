@@ -121,7 +121,7 @@ passport.use(
         crypto.pbkdf2(
           password,
           user.salt,
-          10000,
+          310000,
           32,
           "sha256",
           function (err, hashedPassword) {
