@@ -90,4 +90,115 @@ router.get("/logout", function (req, res) {
   });
 });
 
+/* ************************ Swagger ************************ */
+
+/**
+ * @swagger
+ * tags:
+ *   name: Authentication
+ *   description: Authentication endpoints
+ */
+
+/**
+ * @swagger
+ * /register:
+ *   post:
+ *     summary: Register a single user.
+ *     tags: [Authentication]
+ *     description: Adds user credentials to the users collection in database.
+ *     parameters:
+ *      - name: firstName
+ *        in: body
+ *        description: The first name of the user
+ *        required: true
+ *        schema:
+ *           type: string
+ *           min: 4
+ *           max: 40
+ *      - name: lastName
+ *        in: body
+ *        description: The last name of the user
+ *        required: true
+ *        schema:
+ *           type: string
+ *           min: 4
+ *           max: 40
+ *      - name: emailAddr
+ *        in: body
+ *        description: The email address of the user
+ *        required: true
+ *        schema:
+ *           unique: true
+ *           type: string
+ *      - name: password
+ *        in: body
+ *        description: The password for the account
+ *        required: true
+ *        schema:
+ *           type: string
+ *           min: 8
+ *      - name: position
+ *        in: body
+ *        description: The position of the user. Default is member but can be set to admin as well
+ *        required: false
+ *        schema:
+ *           type: string
+ *           default: default value is member
+ *      - name: address
+ *        in: body
+ *        description: The address of the user
+ *        required: false
+ *        schema:
+ *           type: string
+ *     responses:
+ *       200:
+ *         description: User successfully created.
+ *       400:
+ *         description: Failed validation schema. Missing credintials.
+ *       500:
+ *         description: Internal server error.
+ *
+ */
+
+/**
+ * @swagger
+ * /login:
+ *    post:
+ *      summary: Allows user to obtain access to restricted resources
+ *      tags: [Authentication]
+ *      description: Server checks user credentials. If user exists in database and
+ *                   entered password matches with the database password, a cookie is
+ *                   given to the user that can be used with future requests.
+ *      parameters:
+ *      - name: username
+ *        in: x-www-form-urlencoded
+ *        description: The email address of the user is the username
+ *        required: true
+ *        schema:
+ *           unique: true
+ *           type: string
+ *      - name: password
+ *        in: x-www-form-urlencoded
+ *        description: The password for the account
+ *        required: true
+ *        schema:
+ *           type: string
+ *           min: 8
+ *      responses:
+ *       200:
+ *         description: Login success.
+ */
+
+/**
+ * @swagger
+ * /logout:
+ *    get:
+ *      summary: User logs out of session
+ *      tags: [Authentication]
+ *      description: User logs out of session and cookie is discarded
+ *      responses:
+ *        200:
+ *          description: Successfully logged out
+ */
+
 module.exports = router;

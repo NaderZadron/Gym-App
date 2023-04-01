@@ -17,6 +17,8 @@ const helmet = require("helmet");
 const rateLimit = require("express-rate-limit");
 const mongoSanitize = require("express-mongo-sanitize");
 const cors = require("cors");
+const swaggerUi = require("swagger-ui-express");
+const specs = require("./swagger");
 
 app.use(
   cors({
@@ -159,6 +161,9 @@ const limiter = rateLimit({
   max: 100, // limit each IP to 100 requests per windowMs
 });
 app.use(limiter);
+
+/* Swagger */
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 
 /* API routes */
 app.use("/", authRouter); // Authentication Routes
