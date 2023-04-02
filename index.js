@@ -79,6 +79,12 @@ app.use(
       secret: process.env.SECRET,
       touchAfter: 24 * 60 * 60,
     }),
+    cookie: {
+      secure: true,
+      httpOnly: true,
+      sameSite: "lax",
+      maxAge: 24 * 60 * 60 * 1000 * 3, // session expiration time in milliseconds
+    },
   })
 );
 /* Middleware */
