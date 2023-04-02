@@ -22,7 +22,7 @@ const specs = require("./swagger");
 
 app.use(
   cors({
-    origin: "http://localhost:3000" || process.env.REACT_URI,
+    origin: "https://localhost:3000" || process.env.REACT_URI,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })

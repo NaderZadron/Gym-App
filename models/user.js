@@ -33,6 +33,10 @@ const userSchema = new mongoose.Schema({
     default: "member",
     required: true,
   },
+  createdAt: {
+    type: Date,
+    default: Date.now,
+  },
   // One to many relationship
   attending: [
     {
