@@ -7,6 +7,8 @@ const userSchema = Joi.object({
   address: Joi.string(),
   emailAddr: Joi.string().email().required(),
   position: Joi.string().valid("member", "coach", "admin").required(),
+  createdAt: Joi.date(),
+  bio: Joi.string(),
   attending: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
 });
 

@@ -50,7 +50,7 @@ app.use((req, res, next) => {
   }
   res.setHeader(
     "Access-Control-Allow-Origin",
-    process.env.REACT_URI || "http://localhost:3000"
+    process.env.REACT_URI || "https://localhost:3000"
   ); // Replace with your client-side domain
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();

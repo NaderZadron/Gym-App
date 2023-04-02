@@ -25,6 +25,9 @@ const classSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  description: {
+    type: String,
+  },
   attendants: [
     {
       type: mongoose.Schema.Types.ObjectId,

@@ -7,6 +7,7 @@ const classSchema = Joi.object({
   capacity: Joi.number().integer().positive().required(),
   typeOfClass: Joi.string().required(),
   location: Joi.string().required(),
+  description: Joi.string(),
   attendants: Joi.array().items(Joi.string().regex(/^[0-9a-fA-F]{24}$/)),
 });
 
