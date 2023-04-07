@@ -8,6 +8,7 @@ const mongoose = require("mongoose");
 const User = require("./models/user"); // User schema
 var authRouter = require("./routes/auth");
 const classRouter = require("./routes/class");
+const userRouter = require("./routes/user");
 const passport = require("passport");
 const session = require("express-session");
 const MongoStore = require("connect-mongo");
@@ -66,6 +67,8 @@ mongoose
   .catch((err) => {
     console.log("Error", err);
   });
+
+
 
 app.use(
   session({
@@ -174,6 +177,7 @@ app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(specs));
 /* API routes */
 app.use("/", authRouter); // Authentication Routes
 app.use("/class", classRouter); // Class Routes
+app.use("/user", userRouter); // User Routes
 app.get("/", (req, res) => {
   res.status(200).json({
     message:
