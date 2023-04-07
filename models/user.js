@@ -6,9 +6,11 @@ const userSchema = new mongoose.Schema({
     min: 8,
     type: String,
     required: true,
+    select: false,
   },
   salt: {
     type: String,
+    select: false,
   },
   firstName: {
     min: 4,
