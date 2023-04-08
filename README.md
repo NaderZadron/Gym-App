@@ -1,22 +1,29 @@
-## Server: Has everything related to the server inside it.
+## Server - All back-end functionality is contained here
 
 #### Routes:
 
-Consists of .js files that handle different request/response to a certain endpoint (mini-app). Define get, post, delete, update routes for a specific endpoint in this directory and export it to index.js. See Express_auth slides, page 16 for more information.
+Consists of .js files that handle different request/response to a certain endpoint (mini-app). 
 
-- /routes/auth.js: Has all of the user authentication routes (login, register, logout)
+GET, POST, DELETE, and UPDATE (PUT) routes are defined in this directory for a specific endpoint and must be exported to index.js. See Express_auth slides, page 16 for more information.
+
+- /routes/auth.js: Has all the user authentication routes (login, register, logout)
+- /routes/class.js: Has all the routes for gathering, editing, adding, and deleting classes hosted by the gym 
+- /routes/user.js: Has authenticated admin routes for getting the entire list of website users, and for deleting a specific user, along with general user routes for accessing/editing an individual profile
 
 #### Middleware:
 
-Consists of all the middleware functions to be used in the index.js file.
+Consists of all the middleware functions to be used in the index.js file. This section includes two validators which, when called, check if a user is logged in, or if a user is defined as an admin. 
+
+- The user is validated as logged in through the use of session cookies.
+- The user is validated as an administrator through gathering the user's passport id for the session
 
 #### Models:
 
-Consists of all of the mongoDB schemas that we will be using. Once a schema is designed, a new .js file will be made where the mongoDB schema is written in JS.
+Consists of all the mongoDB schemas that we will be using. Once a schema is designed, a new .js file will be made where the mongoDB schema is written in JS.
 
-- /models/user: Has the user schema. User schema is based on the database design. User schema has a one to many relationship with the class collections.
+- /models/user: Has the user schema. User schema is based on the database design. User schema has a one-to-many relationship with the class collections.
 
-- /models/class: Has the class schema. Design is based on figma. One to many relationship with the user schema.
+- /models/class: Has the class schema. Design is based on figma. One-to-many relationship with the user schema.
 
 #### seeds:
 
