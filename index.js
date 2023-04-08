@@ -20,6 +20,7 @@ const mongoSanitize = require("express-mongo-sanitize");
 const cors = require("cors");
 const swaggerUi = require("swagger-ui-express");
 const specs = require("./swagger");
+const cookieParser = require("cookie-parser");
 
 app.use(
   cors({
@@ -68,8 +69,11 @@ mongoose
     console.log("Error", err);
   });
 
+/* Middleware */
+app.use(express.urlencoded({ extended: true }));
+app.use(express.json());
 
-
+app.use(cookieParser());
 app.use(
   session({
     secret: process.env.SECRET,
@@ -82,17 +86,9 @@ app.use(
       secret: process.env.SECRET,
       touchAfter: 24 * 60 * 60,
     }),
-    cookie: {
-      secure: true,
-      httpOnly: true,
-      sameSite: "lax",
-      maxAge: 24 * 60 * 60 * 1000 * 3, // session expiration time in milliseconds
-    },
   })
 );
-/* Middleware */
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use(passport.authenticate("session"));
 
 // Register the authentication middleware with the Express app
 app.use(passport.initialize());
