@@ -32,5 +32,5 @@ Consists of functions that can be easily ran using node in terminal that creates
 - /seeds/userSchemaSeed: Adds dummy data to the user collection in mongodb. To run, do node userSchemaSeed.
 
 
-#### Import Postamn Project:
+### Import Postamn Project:
 [![Run in Postman](https://run.pstmn.io/button.svg)](https://app.getpostman.com/run-collection/22241646-c6ae8f9c-005f-4f22-9e56-00274f9995d4?action=collection%2Ffork&collection-url=entityId%3D22241646-c6ae8f9c-005f-4f22-9e56-00274f9995d4%26entityType%3Dcollection%26workspaceId%3D345d5336-45b0-4725-8e70-42642449c842)
