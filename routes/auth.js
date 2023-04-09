@@ -76,6 +76,11 @@ router.post("/login", (req, res, next) => {
       if (err) {
         return next(err);
       }
+      res.cookie("sessionId", req.session.passport.user, {
+        maxAge: 3600000,
+        httpOnly: true,
+      });
+      console.log(req.session.passport.user);
       return res.status(200).json({ message: "Login success" });
     });
   })(req, res, next);
