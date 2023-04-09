@@ -76,7 +76,7 @@ router.post("/login", (req, res, next) => {
       if (err) {
         return next(err);
       }
-      res.cookie("sessionId", req.session.passport.user, {
+      res.cookie("session", req.session.passport.user, {
         maxAge: 3600000,
         httpOnly: true,
       });
