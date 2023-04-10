@@ -62,8 +62,8 @@ router.get("/login", function (req, res) {
   });
 });
 
-router.post("/login", (req, res, next) => {
-  passport.authenticate("local", (err, user, info) => {
+router.post("/login", async (req, res, next) => {
+  passport.authenticate("local", async (err, user, info) => {
     if (err) {
       return next(err);
     }
@@ -72,16 +72,17 @@ router.post("/login", (req, res, next) => {
         .status(401)
         .json({ message: "Username or password incorrect" });
     }
-    req.logIn(user, (err) => {
+    req.logIn(user, async (err) => {
       if (err) {
         return next(err);
       }
-      res.cookie("session", req.session.passport.user, {
-        maxAge: 3600000,
-        httpOnly: true,
-      });
-      console.log(req.session.passport.user);
-      return res.status(200).json({ message: "Login success" });
+      try {
+        const user = await User.findById(req.user._id);
+        return res.status(200).json({ message: "Login success", user });
+      } catch (err) {
+        // Handle the error
+        return res.status(500).send(err);
+      }
     });
   })(req, res, next);
 });
