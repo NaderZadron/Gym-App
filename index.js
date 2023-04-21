@@ -27,6 +27,7 @@ app.use(
     origin: "https://localhost:3000" || process.env.REACT_URI,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
   })
 );
 /* Sanitize Mongo */
@@ -47,9 +48,9 @@ app.use((req, res, next) => {
   res.setHeader("Cache-Control", "no-store");
   res.setHeader("Pragma", "no-cache");
   res.setHeader("Expires", "0");
-  if (req.cookies && req.cookies.sid) {
-    res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
-  }
+  // if (req.cookies && req.cookies.sid) {
+  //   res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
+  // }
   res.setHeader(
     "Access-Control-Allow-Origin",
     process.env.REACT_URI || "https://localhost:3000"
