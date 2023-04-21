@@ -24,7 +24,10 @@ const cookieParser = require("cookie-parser");
 
 app.use(
   cors({
-    origin: "https://localhost:3000" || process.env.REACT_URI,
+    origin:
+      "http://localhost:3000" ||
+      "https://localhost:3000" ||
+      process.env.REACT_URI,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
