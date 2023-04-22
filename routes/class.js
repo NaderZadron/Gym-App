@@ -91,6 +91,8 @@ router
       if (!updatedClass) {
         return res.status(404).json({ error: "Class not found" });
       }
+      console.log(req.cookies);
+
       return res
         .status(200)
         .json({ message: "Class updated successfully", data: updatedClass });
