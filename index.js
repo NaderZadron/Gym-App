@@ -49,10 +49,7 @@ app.use((req, res, next) => {
   // if (req.cookies && req.cookies.sid) {
   //   res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
   // }
-  res.setHeader(
-    "Access-Control-Allow-Origin",
-    process.env.REACT_URI || "https://localhost:3000" || "http://localhost:3000"
-  ); // Replace with your client-side domain
+  res.setHeader("Access-Control-Allow-Origin", "http://localhost:3000"); // Replace with your client-side domain
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
