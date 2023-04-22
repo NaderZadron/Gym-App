@@ -9,6 +9,8 @@ const { isAdmin } = require("../middleware/isAdmin");
 router
   .route("/")
   .get(async (req, res, next) => {
+    console.log(req.cookies);
+
     try {
       const allData = await Class.find({});
       if (!allData) {
@@ -27,6 +29,8 @@ router
     }
   })
   .post(isLoggedIn, isAdmin(), async (req, res, next) => {
+    console.log(req.cookies);
+
     try {
       const { error, value } = classSchemaValidator.validate(req.body);
       if (error) {
@@ -51,6 +55,8 @@ router
 router
   .route("/:id")
   .get(async (req, res, next) => {
+    console.log(req.cookies);
+
     try {
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(400).json({ error: "Invalid ID" });
