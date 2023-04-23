@@ -24,7 +24,7 @@ const cookieParser = require("cookie-parser");
 
 app.use(
   cors({
-    origin: "https://127.0.0.1:3000" || process.env.REACT_URI,
+    origin: "https://localhost:3000" || process.env.REACT_URI,
     credentials: true,
   })
 );
@@ -49,7 +49,7 @@ app.use((req, res, next) => {
   // if (req.cookies && req.cookies.sid) {
   //   res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
   // }
-  res.setHeader("Access-Control-Allow-Origin", "https://127.0.0.1:3000"); // Replace with your client-side domain
+  res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000"); // Replace with your client-side domain
   res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
