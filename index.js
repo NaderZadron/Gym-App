@@ -26,6 +26,8 @@ const bodyParser = require("body-parser");
 app.use(
   cors({
     origin: "https://localhost:3000" || process.env.REACT_URI,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
   })
 );
 
@@ -50,8 +52,8 @@ app.use((req, res, next) => {
   // if (req.cookies && req.cookies.sid) {
   //   res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
   // }
-  res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000"); // Replace with your client-side domain
-  res.setHeader("Access-Control-Allow-Credentials", "true");
+  // res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000"); // Replace with your client-side domain
+  // res.setHeader("Access-Control-Allow-Credentials", "true");
   next();
 });
 
