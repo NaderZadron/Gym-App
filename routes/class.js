@@ -5,6 +5,7 @@ const classSchemaValidator = require("../models/classSchemaValidator");
 const mongoose = require("mongoose");
 const { isLoggedIn } = require("../middleware/isLoggedIn");
 const { isAdmin } = require("../middleware/isAdmin");
+const authJwtController = require("../middleware/auth_jwt");
 
 router
   .route("/")
@@ -28,35 +29,35 @@ router
       next(error);
     }
   })
-  .post(isLoggedIn, isAdmin(), async (req, res, next) => {
-    console.log(req.cookies);
+  .post(
+    authJwtController.isAuthenticated,
+    isAdmin(),
+    async (req, res, next) => {
+      try {
+        const { error, value } = classSchemaValidator.validate(req.body);
+        if (error) {
+          return res.status(400).json({
+            message: "Invalid request body",
+            error: error.details[0].message,
+          });
+        }
 
-    try {
-      const { error, value } = classSchemaValidator.validate(req.body);
-      if (error) {
-        return res.status(400).json({
-          message: "Invalid request body",
-          error: error.details[0].message,
+        const savedClass = new Class(value);
+        await savedClass.save();
+
+        res.status(201).json({
+          message: "Class successfully added",
+          class: savedClass,
         });
+      } catch (error) {
+        next(error);
       }
-
-      const savedClass = new Class(value);
-      await savedClass.save();
-
-      res.status(201).json({
-        message: "Class successfully added",
-        class: savedClass,
-      });
-    } catch (error) {
-      next(error);
     }
-  });
+  );
 
 router
   .route("/:id")
   .get(async (req, res, next) => {
-    console.log(req.cookies);
-
     try {
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(400).json({ error: "Invalid ID" });
@@ -77,7 +78,7 @@ router
       next(err);
     }
   })
-  .put(isLoggedIn, isAdmin(), async (req, res, next) => {
+  .put(authJwtController.isAuthenticated, isAdmin(), async (req, res, next) => {
     try {
       if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
         return res.status(400).json({ error: "Invalid ID" });
@@ -106,25 +107,29 @@ router
       next(err);
     }
   })
-  .delete(isLoggedIn, isAdmin(), async (req, res, next) => {
-    try {
-      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-        return res.status(400).json({ error: "Invalid ID" });
-      }
-      const data = await Class.findByIdAndDelete(req.params.id);
-      if (!data) {
-        return res.status(404).json({
-          message: "Does Not Exist",
+  .delete(
+    authJwtController.isAuthenticated,
+    isAdmin(),
+    async (req, res, next) => {
+      try {
+        if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+          return res.status(400).json({ error: "Invalid ID" });
+        }
+        const data = await Class.findByIdAndDelete(req.params.id);
+        if (!data) {
+          return res.status(404).json({
+            message: "Does Not Exist",
+          });
+        }
+        res.status(200).json({
+          message: `The class with id ${req.params.id} has been deleted`,
+          data,
         });
+      } catch (err) {
+        next(err);
       }
-      res.status(200).json({
-        message: `The class with id ${req.params.id} has been deleted`,
-        data,
-      });
-    } catch (err) {
-      next(err);
     }
-  });
+  );
 
 /* ************************ Swagger ************************ */
 

@@ -4,26 +4,29 @@ const User = require("../models/user");
 const { isLoggedIn } = require("../middleware/isLoggedIn");
 const { isAdmin } = require("../middleware/isAdmin");
 const crypto = require("crypto");
+const authJwtController = require("../middleware/auth_jwt");
 
-router.route("/").get(isLoggedIn, isAdmin(), async function (req, res) {
-  try {
-    const users = await User.find({}, { salt: 0, password: 0 });
-    if (!users) {
-      return res.status(204).json({ message: "List of users not found" });
+router
+  .route("/")
+  .get(authJwtController.isAuthenticated, isAdmin(), async function (req, res) {
+    try {
+      const users = await User.find({}, { salt: 0, password: 0 });
+      if (!users) {
+        return res.status(204).json({ message: "List of users not found" });
+      }
+      res.status(200).json(users);
+      console.log("[Returned list of users]");
+    } catch (err) {
+      res.status(500).json({
+        message: "[ERROR - issue encountered while getting all users]",
+        error: err.message,
+      });
     }
-    res.status(200).json(users);
-    console.log("[Returned list of users]");
-  } catch (err) {
-    res.status(500).json({
-      message: "[ERROR - issue encountered while getting all users]",
-      error: err.message,
-    });
-  }
-});
+  });
 
 router
   .route("/:id")
-  .get(isLoggedIn, async function (req, res) {
+  .get(authJwtController.isAuthenticated, async function (req, res) {
     try {
       const user = await User.findById(req.session.passport.user.id).select(
         "-salt -password"
@@ -42,7 +45,7 @@ router
   })
 
   // this call does not properly hide the password upon update
-  .put(isLoggedIn, async function (req, res) {
+  .put(authJwtController.isAuthenticated, async function (req, res) {
     console.log(req.cookies);
     try {
       const user = await User.findById(req.session.passport.user.id);
@@ -56,26 +59,26 @@ router
       Object.assign(user, req.body);
 
       // hash password if present in req.body
-      if (req.body.hasOwnProperty("password")) {
-        const salt = crypto.randomBytes(16).toString("hex");
-        const hashedPassword = await new Promise((resolve, reject) => {
-          crypto.pbkdf2(
-            req.body.password,
-            salt,
-            310000,
-            32,
-            "sha256",
-            (err, hashedPassword) => {
-              if (err) {
-                return reject(new Error("Error hashing password"));
-              }
-              resolve(hashedPassword.toString("hex"));
-            }
-          );
-        });
-        user.salt = salt;
-        user.password = hashedPassword;
-      }
+      // if (req.body.hasOwnProperty("password")) {
+      //   const salt = crypto.randomBytes(16).toString("hex");
+      //   const hashedPassword = await new Promise((resolve, reject) => {
+      //     crypto.pbkdf2(
+      //       req.body.password,
+      //       salt,
+      //       310000,
+      //       32,
+      //       "sha256",
+      //       (err, hashedPassword) => {
+      //         if (err) {
+      //           return reject(new Error("Error hashing password"));
+      //         }
+      //         resolve(hashedPassword.toString("hex"));
+      //       }
+      //     );
+      //   });
+      //   user.salt = salt;
+      //   user.password = hashedPassword;
+      // }
 
       // save updated user object to MongoDB
       await user.save();
