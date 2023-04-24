@@ -23,38 +23,37 @@ const specs = require("./swagger");
 const cookieParser = require("cookie-parser");
 const bodyParser = require("body-parser");
 
-// app.use(
-//   cors({
-//     origin: "https://localhost:3000" || process.env.REACT_URI,
-//     credentials: true,
-//   })
-// );
-app.use(cors());
+app.use(
+  cors({
+    origin: "https://localhost:3000" || process.env.REACT_URI,
+  })
+);
+
 /* Sanitize Mongo */
 app.use(mongoSanitize());
 
 /* Secure API */
-// app.use(helmet());
-// app.use((req, res, next) => {
-//   res.setHeader("X-Content-Type-Options", "nosniff");
-//   res.setHeader("X-Frame-Options", "SAMEORIGIN");
-//   res.setHeader("X-XSS-Protection", "1; mode=block");
-//   res.setHeader("Content-Security-Policy", "default-src 'self'");
-//   res.setHeader("Referrer-Policy", "no-referrer");
-//   res.setHeader(
-//     "Strict-Transport-Security",
-//     "max-age=31536000; includeSubDomains; preload"
-//   );
-//   res.setHeader("Cache-Control", "no-store");
-//   res.setHeader("Pragma", "no-cache");
-//   res.setHeader("Expires", "0");
-//   // if (req.cookies && req.cookies.sid) {
-//   //   res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
-//   // }
-//   res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000"); // Replace with your client-side domain
-//   res.setHeader("Access-Control-Allow-Credentials", "true");
-//   next();
-// });
+app.use(helmet());
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");
+  res.setHeader("X-XSS-Protection", "1; mode=block");
+  res.setHeader("Content-Security-Policy", "default-src 'self'");
+  res.setHeader("Referrer-Policy", "no-referrer");
+  res.setHeader(
+    "Strict-Transport-Security",
+    "max-age=31536000; includeSubDomains; preload"
+  );
+  res.setHeader("Cache-Control", "no-store");
+  res.setHeader("Pragma", "no-cache");
+  res.setHeader("Expires", "0");
+  // if (req.cookies && req.cookies.sid) {
+  //   res.cookie("sid", req.cookies.sid, { httpOnly: true, secure: true });
+  // }
+  res.setHeader("Access-Control-Allow-Origin", "https://localhost:3000"); // Replace with your client-side domain
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  next();
+});
 
 mongoose.set("strictQuery", false);
 mongoose
