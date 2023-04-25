@@ -16,7 +16,7 @@ router.post("/register", function (req, res) {
     });
   } else {
     const { emailAddr, password, firstName, lastName, address, position, bio } =
-      value;
+        value;
     var user = new User();
     user.firstName = firstName;
     user.lastName = lastName;
@@ -48,37 +48,38 @@ router.post("/login", function (req, res) {
   userNew.password = req.body.password;
 
   User.findOne({ emailAddr: userNew.emailAddr })
-    .select("_id password firstName lastName emailAddr position")
-    .exec(function (err, user) {
-      if (err) {
-        res.send(err);
-      }
-      if (!user) {
-        res.status(401).send({ success: false, msg: "Authentication failed." });
-      } else {
-        user.comparePassword(userNew.password, function (isMatch) {
-          if (isMatch) {
-            var userToken = { id: user.id, username: user.emailAddr };
-            var token = jwt.sign(userToken, process.env.SECRET_KEY);
-            user.password = "";
-            res.json({
-              success: true,
-              token: "JWT " + token,
-              data: {
-                firstName: user.firstName,
-                lastName: user.lastName,
-                emailAddr: user.emailAddr,
-                position: user.position,
-              },
-            });
-          } else {
-            res
-              .status(401)
-              .send({ success: false, msg: "Authentication failed." });
-          }
-        });
-      }
-    });
+      .select("_id password firstName lastName emailAddr position")
+      .exec(function (err, user) {
+        if (err) {
+          res.send(err);
+        }
+        if (!user) {
+          res.status(401).send({ success: false, msg: "Authentication failed." });
+        } else {
+          user.comparePassword(userNew.password, function (isMatch) {
+            if (isMatch) {
+              var userToken = { id: user.id, username: user.emailAddr };
+              var token = jwt.sign(userToken, process.env.SECRET_KEY);
+              user.password = "";
+              res.json({
+                success: true,
+                token: "JWT " + token,
+                data: {
+                  userId: user._id,
+                  firstName: user.firstName,
+                  lastName: user.lastName,
+                  emailAddr: user.emailAddr,
+                  position: user.position,
+                },
+              });
+            } else {
+              res
+                  .status(401)
+                  .send({ success: false, msg: "Authentication failed." });
+            }
+          });
+        }
+      });
 });
 
 router.get("/logout", function (req, res) {
