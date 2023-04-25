@@ -48,7 +48,7 @@ router.post("/login", function (req, res) {
   userNew.password = req.body.password;
 
   User.findOne({ emailAddr: userNew.emailAddr })
-    .select("name username password")
+    .select("_id password")
     .exec(function (err, user) {
       if (err) {
         res.send(err);
@@ -60,7 +60,8 @@ router.post("/login", function (req, res) {
           if (isMatch) {
             var userToken = { id: user.id, username: user.emailAddr };
             var token = jwt.sign(userToken, process.env.SECRET_KEY);
-            res.json({ success: true, token: "JWT " + token });
+            user.password = "";
+            res.json({ success: true, token: "JWT " + token, data: user });
           } else {
             res
               .status(401)
