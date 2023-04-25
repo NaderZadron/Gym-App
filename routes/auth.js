@@ -29,7 +29,7 @@ router.post("/register", function (req, res) {
 
     user.save(function (err) {
       if (err) {
-        if (err.code == 11000)
+        if (err.code === 11000) /* changed this to remove potential for errors */
           return res.json({
             success: false,
             message: "A user with that email Address already exists.",
@@ -48,7 +48,7 @@ router.post("/login", function (req, res) {
   userNew.password = req.body.password;
 
   User.findOne({ emailAddr: userNew.emailAddr })
-    .select("_id password")
+    .select("_id password firstName lastName emailAddr position")
     .exec(function (err, user) {
       if (err) {
         res.send(err);
@@ -61,7 +61,16 @@ router.post("/login", function (req, res) {
             var userToken = { id: user.id, username: user.emailAddr };
             var token = jwt.sign(userToken, process.env.SECRET_KEY);
             user.password = "";
-            res.json({ success: true, token: "JWT " + token, data: user });
+            res.json({
+              success: true,
+              token: "JWT " + token,
+              data: {
+                firstName: user.firstName,
+                lastName: user.lastName,
+                emailAddr: user.emailAddr,
+                position: user.position,
+              },
+            });
           } else {
             res
               .status(401)
@@ -71,88 +80,6 @@ router.post("/login", function (req, res) {
       }
     });
 });
-
-// router.post("/register", async function (req, res) {
-//   try {
-//     const { error, value } = userSchemaValidator.validate(req.body);
-//     if (error) {
-//       return res.status(400).json({ error: error.details[0].message });
-//     }
-
-//     const { emailAddr, password, firstName, lastName, address, position } =
-//       value;
-
-//     // Generate a random salt value and use it to hash the user's password
-//     const salt = crypto.randomBytes(16).toString("hex");
-//     const hashedPassword = await new Promise((resolve, reject) => {
-//       crypto.pbkdf2(
-//         password,
-//         salt,
-//         310000,
-//         32,
-//         "sha256",
-//         (err, hashedPassword) => {
-//           if (err) {
-//             return reject(new Error("Error hashing password"));
-//           }
-//           resolve(hashedPassword.toString("hex"));
-//         }
-//       );
-//     });
-//     // Create a new user document in the database
-//     const user = new User({
-//       emailAddr,
-//       salt: salt.toString(),
-//       password: hashedPassword.toString("Hex"),
-//       firstName,
-//       lastName,
-//       address,
-//       position,
-//     });
-
-//     await user.save();
-
-//     res.status(200).json({
-//       message: "User successfully created",
-//     });
-//   } catch (err) {
-//     res.status(500).json({
-//       message: "Internal Server Error",
-//       error: err.message,
-//     });
-//   }
-// });
-
-// router.get("/login", function (req, res) {
-//   res.status(200).json({
-//     message: "Login page",
-//   });
-// });
-
-// router.post("/login", async (req, res, next) => {
-//   passport.authenticate("local", async (err, user, info) => {
-//     if (err) {
-//       return next(err);
-//     }
-//     if (!user) {
-//       return res
-//         .status(401)
-//         .json({ message: "Username or password incorrect" });
-//     }
-//     req.logIn(user, async (err) => {
-//       if (err) {
-//         return next(err);
-//       }
-//       try {
-//         const user = await User.findById(req.user._id);
-//         return res.status(200).json({ message: "Login success", user });
-//       } catch (err) {
-//         // Handle the error
-//         return res.status(500).send(err);
-//       }
-//     });
-//   })(req, res, next);
-// });
 
 router.get("/logout", function (req, res) {
   req.logout(function (err) {
