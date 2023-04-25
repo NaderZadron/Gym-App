@@ -48,7 +48,7 @@ router.post("/login", function (req, res) {
   userNew.password = req.body.password;
 
   User.findOne({ emailAddr: userNew.emailAddr })
-      .select("_id password firstName lastName emailAddr position, createdAt")
+      .select("_id password firstName lastName emailAddr position createdAt")
       .exec(function (err, user) {
         if (err) {
           res.send(err);
