@@ -48,7 +48,7 @@ router.post("/login", function (req, res) {
   userNew.password = req.body.password;
 
   User.findOne({ emailAddr: userNew.emailAddr })
-      .select("_id password firstName lastName emailAddr position")
+      .select("_id password firstName lastName emailAddr position, createdAt")
       .exec(function (err, user) {
         if (err) {
           res.send(err);
@@ -65,6 +65,7 @@ router.post("/login", function (req, res) {
                 success: true,
                 token: "JWT " + token,
                 data: {
+                  createdAt: user.createdAt,
                   userId: user._id,
                   firstName: user.firstName,
                   lastName: user.lastName,
