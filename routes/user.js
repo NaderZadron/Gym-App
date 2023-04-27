@@ -5,79 +5,84 @@ const { isLoggedIn } = require("../middleware/isLoggedIn");
 const { isAdmin } = require("../middleware/isAdmin");
 const crypto = require("crypto");
 const authJwtController = require("../middleware/auth_jwt");
+const jwt = require("jsonwebtoken");
 
 router
-    .route("/")
-    .get(authJwtController.isAuthenticated, isAdmin(), async function (req, res) {
-      try {
-        const users = await User.find({}, { salt: 0, password: 0 });
-        if (!users) {
-          return res.status(204).json({ message: "List of users not found" });
-        }
-        res.status(200).json(users);
-        console.log("[Returned list of users]");
-      } catch (err) {
-        res.status(500).json({
-          message: "[ERROR - issue encountered while getting all users]",
-          error: err.message,
-        });
+  .route("/")
+  .get(authJwtController.isAuthenticated, isAdmin(), async function (req, res) {
+    try {
+      const users = await User.find({}, { salt: 0, password: 0 });
+      if (!users) {
+        return res.status(204).json({ message: "List of users not found" });
       }
-    });
+      res.status(200).json(users);
+      console.log("[Returned list of users]");
+    } catch (err) {
+      res.status(500).json({
+        message: "[ERROR - issue encountered while getting all users]",
+        error: err.message,
+      });
+    }
+  });
 
 router
-    .route("/:id")
-    .get(authJwtController.isAuthenticated, async function (req, res) {
-      try {
-        const user = await User.findById(req.session.passport.user.id).select(
-            "-salt -password"
-        );
-        if (!user) {
-          return res.status(204).json({ message: "Unable to find user profile" });
-        }
-        res.status(200).json(user);
-        console.log("[Sent user to profile page]");
-      } catch (err) {
-        res.status(500).json({
-          message: "[ERROR - issue encountered while calling profile route]",
-          error: err.message,
-        });
+  .route("/:id")
+  .get(authJwtController.isAuthenticated, async function (req, res) {
+    try {
+      const user = await User.findById(req.session.passport.user.id).select(
+        "-salt -password"
+      );
+      if (!user) {
+        return res.status(204).json({ message: "Unable to find user profile" });
       }
-    })
+      res.status(200).json(user);
+      console.log("[Sent user to profile page]");
+    } catch (err) {
+      res.status(500).json({
+        message: "[ERROR - issue encountered while calling profile route]",
+        error: err.message,
+      });
+    }
+  })
 
-    // this call does not properly hide the password upon update
-    .put(authJwtController.isAuthenticated, async function (req, res) {
-      console.log(req.cookies);
-      try {
-        const user = await User.findById(req.session.passport.user.id);
-        if (!user) {
-          return res
-              .status(204)
-              .json({ message: "Unable to find user profile to update" });
-        }
-
-        // update user object with data from request body
-        Object.assign(user, req.body);
-
-
-        // save updated user object to MongoDB
-        await user.save();
-
-        res
-            .status(200)
-            .json({ message: "User information successfully updated", user });
-        console.log(`[User has been updated]`);
-      } catch (err) {
-        res.status(500).json({
-          message: "[ERROR - issue encountered while updating user]",
-          error: err.message,
-        });
+  // this call does not properly hide the password upon update
+  .put(authJwtController.isAuthenticated, async function (req, res) {
+    console.log(req.cookies);
+    try {
+      const user = await User.findById(req.session.passport.user.id);
+      if (!user) {
+        return res
+          .status(204)
+          .json({ message: "Unable to find user profile to update" });
       }
-    })
-    .delete(authJwtController.isAuthenticated, isAdmin(), async function (req, res) {
+
+      // update user object with data from request body
+      Object.assign(user, req.body);
+
+      // save updated user object to MongoDB
+      await user.save();
+
+      res
+        .status(200)
+        .json({ message: "User information successfully updated", user });
+      console.log(`[User has been updated]`);
+    } catch (err) {
+      res.status(500).json({
+        message: "[ERROR - issue encountered while updating user]",
+        error: err.message,
+      });
+    }
+  })
+  .delete(
+    authJwtController.isAuthenticated,
+    isAdmin(),
+    async function (req, res) {
       try {
         const user = await User.findByIdAndDelete(req.params.id);
         if (!user) {
-          return res.status(204).json({ message: "Cannot find user to delete" });
+          return res
+            .status(204)
+            .json({ message: "Cannot find user to delete" });
         }
         res.status(200).json({ message: "User has been successfully deleted" });
         console.log(`[User has been deleted]`);
@@ -87,7 +92,8 @@ router
           error: err.message,
         });
       }
-    });
+    }
+  );
 
 module.exports = router;
 

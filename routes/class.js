@@ -1,8 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const Class = require("../models/class");
+const User = require("../models/user");
+const Attendance = require("../models/attendance");
 const classSchemaValidator = require("../models/classSchemaValidator");
+const attendanceSchemaValidator = require("../models/attendanceSchemaValidator");
 const mongoose = require("mongoose");
+const jwt = require("jsonwebtoken");
 const { isLoggedIn } = require("../middleware/isLoggedIn");
 const { isAdmin } = require("../middleware/isAdmin");
 const authJwtController = require("../middleware/auth_jwt");
@@ -113,7 +117,7 @@ router
     async (req, res, next) => {
       try {
         if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
-          return res.status(400).json({ error: "Invalid ID" });
+          return res.status(400).json({ error: "Invalid class ID" });
         }
         const data = await Class.findByIdAndDelete(req.params.id);
         if (!data) {
@@ -130,6 +134,57 @@ router
       }
     }
   );
+
+router.post(
+  "/:id/register",
+  authJwtController.isAuthenticated,
+  async (req, res, next) => {
+    try {
+      if (!mongoose.Types.ObjectId.isValid(req.params.id)) {
+        return res.status(400).json({ error: "Invalid class ID" });
+      }
+      const token = req.headers.authorization.split(" ")[1]; // get the token from the authorization header
+      const decoded = jwt.verify(token, process.env.SECRET_KEY); // verify the token
+      const userId = decoded.id; // get the user ID from the token
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      const classId = req.params.id;
+      const classs = await Class.findById(classId);
+      if (!classs) {
+        return res.status(404).json({ error: "Class not found" });
+      }
+      var classAttendance = {
+        user: user.id,
+        class: classs.id,
+      };
+      const { error, value } =
+        attendanceSchemaValidator.validate(classAttendance);
+      if (error) {
+        return res.status(400).json({
+          message: "Invalid request body",
+          error: error.details[0].message,
+        });
+      }
+
+      const savedAttendance = new Attendance(value);
+      await savedAttendance.save();
+
+      res.status(200).json({
+        message: "User successfully registered to the class",
+        db: savedAttendance,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: error,
+      });
+    }
+  }
+);
 
 /* ************************ Swagger ************************ */
 
@@ -324,6 +379,32 @@ router
  *         description: Invalid class id.
  *       404:
  *         description: Class Not Found.
+ *
+ */
+
+/**
+ * @swagger
+ * /class/:classId/register:
+ *   post:
+ *     summary: User registers for a class.
+ *     tags: [Class]
+ *     security:
+ *       - cookieAuth: []
+ *     description: Allows user to register for a class. User needs to be logged in.
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: The id of the class
+ *        required: true
+ *        schema:
+ *           type: ObjectID
+ *     responses:
+ *       200:
+ *         description: User successfully registered for the class.
+ *       400:
+ *         description: Missing class id or user id in request.
+ *       404:
+ *         description: Class or User not found.
  *
  */
 
