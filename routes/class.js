@@ -155,6 +155,16 @@ router.post(
       if (!classs) {
         return res.status(404).json({ error: "Class not found" });
       }
+      // Check if user has already registered for the class
+      const existingAttendance = await Attendance.findOne({
+        user: user.id,
+        class: classs.id,
+      });
+      if (existingAttendance) {
+        return res.status(409).json({
+          message: "User has already registered for this class",
+        });
+      }
       var classAttendance = {
         user: user.id,
         class: classs.id,
@@ -211,6 +221,55 @@ router.get(
       res.status(200).json({
         message: "All users registered for this class",
         data: users,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: error,
+      });
+    }
+  }
+);
+
+router.delete(
+  "/:classId/registrations/:registrationId",
+  async (req, res, next) => {
+    try {
+      const classId = req.params.classId;
+      const registrationId = req.params.registrationId;
+
+      // Check if classId and registrationId are valid MongoDB ObjectIds
+      if (
+        !mongoose.Types.ObjectId.isValid(classId) ||
+        !mongoose.Types.ObjectId.isValid(registrationId)
+      ) {
+        return res.status(400).json({
+          message: "Invalid class ID or registration ID",
+        });
+      }
+
+      // Check if the registration exists for the specified class
+      const registration = await Attendance.findOne({
+        class: classId,
+        _id: registrationId,
+      }).exec();
+
+      if (!registration) {
+        return res.status(404).json({
+          message: "Registration not found for this class",
+        });
+      }
+
+      // Delete the registration
+      await Attendance.deleteOne({
+        class: classId,
+        _id: registrationId,
+      }).exec();
+
+      res.status(200).json({
+        message: "Registration canceled successfully",
       });
     } catch (error) {
       console.log(error);
@@ -468,6 +527,38 @@ router.get(
  *         description: Missing class id.
  *       404:
  *         description: Class or User not found.
+ *
+ */
+
+/**
+ * @swagger
+ * /:classId/registrations/:registrationId:
+ *   delete:
+ *     summary: Delete a user from attending the class.
+ *     tags: [Class]
+ *     security:
+ *       - cookieAuth: []
+ *     description: If user cant make it to the class, s/he can remove this class from their schedules by deleting the tuple.
+ *     parameters:
+ *      - name: classId
+ *        in: path
+ *        description: The id of the class
+ *        required: true
+ *        schema:
+ *           type: ObjectID
+ *      - name: classId
+ *        in: path
+ *        description: The id of the registration, when the class was registered for, id is created.
+ *        required: true
+ *        schema:
+ *           type: ObjectID
+ *     responses:
+ *       200:
+ *         description: Registration canceled.
+ *       400:
+ *         description: Invalid class id.
+ *       404:
+ *         description: Class Not Found.
  *
  */
 
