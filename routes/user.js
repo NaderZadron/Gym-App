@@ -274,6 +274,8 @@ module.exports = router;
  *     summary: Get all the classes the user is registered for.
  *     tags: [User]
  *     description: Returns a JSON object that contains a list of all classes the user is registered for.
+ *     security:
+ *       - cookieAuth: []
  *     parameters:
  *      - name: userID
  *        in: path

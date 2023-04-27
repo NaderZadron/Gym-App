@@ -186,6 +186,43 @@ router.post(
   }
 );
 
+router.get(
+  "/:id/users",
+  authJwtController.isAuthenticated,
+  async (req, res, next) => {
+    try {
+      const classId = req.params.id;
+      const attendanceRecords = await Attendance.find({
+        class: classId,
+      }).exec();
+      if (attendanceRecords.length === 0) {
+        return res.status(404).json({
+          message: "Attendance records not found",
+        });
+      }
+      // Extract the user IDs from the attendance records
+      const userIds = attendanceRecords.map((record) => record.user);
+      const users = await User.find({ _id: { $in: userIds } }).exec();
+      if (users.length === 0) {
+        res.status(404).json({
+          message: "Users not found",
+        });
+      }
+      res.status(200).json({
+        message: "All users registered for this class",
+        data: users,
+      });
+    } catch (error) {
+      console.log(error);
+      next(error);
+      return res.status(500).json({
+        message: "Internal Server Error",
+        error: error,
+      });
+    }
+  }
+);
+
 /* ************************ Swagger ************************ */
 
 /**
@@ -403,6 +440,32 @@ router.post(
  *         description: User successfully registered for the class.
  *       400:
  *         description: Missing class id or user id in request.
+ *       404:
+ *         description: Class or User not found.
+ *
+ */
+
+/**
+ * @swagger
+ * /class/:classId/users:
+ *   get:
+ *     summary: Return all users registered for a class
+ *     tags: [Class]
+ *     security:
+ *       - cookieAuth: []
+ *     description: Returns all of the users registered for this class in a array of objects.
+ *     parameters:
+ *      - name: id
+ *        in: path
+ *        description: The id of the class
+ *        required: true
+ *        schema:
+ *           type: ObjectID
+ *     responses:
+ *       200:
+ *         description: List of users sent
+ *       400:
+ *         description: Missing class id.
  *       404:
  *         description: Class or User not found.
  *
