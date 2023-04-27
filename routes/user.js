@@ -29,9 +29,10 @@ router
   .route("/:id")
   .get(authJwtController.isAuthenticated, async function (req, res) {
     try {
-      const user = await User.findById(req.session.passport.user.id).select(
-        "-salt -password"
-      );
+      const token = req.headers.authorization.split(" ")[1]; // get the token from the authorization header
+      const decoded = jwt.verify(token, process.env.SECRET_KEY); // verify the token
+      const userId = decoded.id; // get the user ID from the token
+      const user = await User.findById(userId).select("-salt -password");
       if (!user) {
         return res.status(204).json({ message: "Unable to find user profile" });
       }
@@ -47,9 +48,11 @@ router
 
   // this call does not properly hide the password upon update
   .put(authJwtController.isAuthenticated, async function (req, res) {
-    console.log(req.cookies);
     try {
-      const user = await User.findById(req.session.passport.user.id);
+      const token = req.headers.authorization.split(" ")[1]; // get the token from the authorization header
+      const decoded = jwt.verify(token, process.env.SECRET_KEY); // verify the token
+      const userId = decoded.id; // get the user ID from the token
+      const user = await User.findById(userId);
       if (!user) {
         return res
           .status(204)
