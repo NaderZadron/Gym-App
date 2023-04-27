@@ -1,6 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const User = require("../models/user");
+const Class = require("../models/class");
+const Attendance = require("../models/attendance");
 const { isLoggedIn } = require("../middleware/isLoggedIn");
 const { isAdmin } = require("../middleware/isAdmin");
 const crypto = require("crypto");
@@ -97,6 +99,38 @@ router
       }
     }
   );
+
+router.get(
+  "/:id/classes",
+  authJwtController.isAuthenticated,
+  async (req, res, next) => {
+    try {
+      const userId = req.params.id;
+      const attendanceRecords = await Attendance.find({ user: userId }).exec();
+      if (!attendanceRecords) {
+        return res.status(404).json({
+          message: "No attendance information found",
+        });
+      }
+      // Extract the class IDs from the attendance records
+      const classIds = attendanceRecords.map((record) => record.class);
+      const classes = await Class.find({ _id: { $in: classIds } }).exec();
+      if (!classes) {
+        return res.status(404).json({
+          message: "Class not found",
+        });
+      }
+      res.status(200).json({
+        data: classes,
+      });
+    } catch (error) {
+      res.status(500).json({
+        message: "[ERROR - issue encountered while getting classes]",
+        error: error.message,
+      });
+    }
+  }
+);
 
 module.exports = router;
 
@@ -230,5 +264,29 @@ module.exports = router;
  *         description: Unable to find user of specified ID.
  *       400:
  *         description: Issue encountered while attempting to delete user.
+ *
+ */
+
+/**
+ * @swagger
+ * /user/:userId/classes:
+ *   get:
+ *     summary: Get all the classes the user is registered for.
+ *     tags: [User]
+ *     description: Returns a JSON object that contains a list of all classes the user is registered for.
+ *     parameters:
+ *      - name: userID
+ *        in: path
+ *        description: The user id
+ *        required: true
+ *        schema:
+ *          type: string
+ *     responses:
+ *       200:
+ *         description: Returned a list of classes.
+ *       404:
+ *         description: Unable to find user, classes or attendance.
+ *       500:
+ *         description: Internal server error.
  *
  */
