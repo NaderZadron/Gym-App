@@ -25,7 +25,7 @@ const bodyParser = require("body-parser");
 
 app.use(
   cors({
-    origin: "https://localhost:3000" || process.env.REACT_URI,
+    origin: "https://final-9njh.onrender.com/" || process.env.REACT_URI,
     methods: ["GET", "POST", "PUT", "DELETE"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
